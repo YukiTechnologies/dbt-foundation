@@ -1,0 +1,25 @@
+# Copy this to ~/.dbt/profiles.yml (or merge into existing) and replace placeholders / use env vars.
+
+dbt_base_project:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ANALYST_DEV
+      database: DEV_DB
+      warehouse: TRANSFORMING
+      schema: analytics
+      threads: 16
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ANALYST_PROD
+      database: PROD_DB
+      warehouse: TRANSFORMING
+      schema: analytics
+      threads: 16

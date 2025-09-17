@@ -1,0 +1,10 @@
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+  rev: v2.0.7
+  hooks:
+  - id: dbt-parse
+    args: ["--cmd-flags", "++no-compile"]
+  - id: check-script-semicolon
+  - id: check-script-has-no-table-name
+    args: ["--ignore-dotless-table"]
+    exclude: '(analyses)/.*'

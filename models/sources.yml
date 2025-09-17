@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    database: PROD_DB  # replace with your production (or dev) raw database
+    schema: RAW_APP    # replace with actual schema
+    tables:
+      - name: customers
+
+  - name: target_db_information_schema
+    database: {{ target.database }}
+    schema: INFORMATION_SCHEMA
+    tables:
+      - name: tables

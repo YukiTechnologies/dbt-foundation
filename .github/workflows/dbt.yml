@@ -1,0 +1,27 @@
+name: dbt Build
+
+on:
+  pull_request:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Install dbt packages
+        run: dbt deps
+      - name: Debug connection
+        run: dbt debug
+      - name: Build modified graph selection
+        run: dbt build --select state:modified+ --state ./ || dbt build
+      - name: Run project evaluator (non-blocking)
+        run: dbt run-operation project_evaluator || true
