@@ -8,7 +8,7 @@ sources:
       - name: customers
 
   - name: target_db_information_schema
-    database: {{ target.database }}
+    database: "{{ target.database }}"
     schema: INFORMATION_SCHEMA
     tables:
       - name: tables
