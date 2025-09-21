@@ -1,4 +1,8 @@
-## 🐧 dbt Base Project
+<div align="center">
+  <img src="assets/images/dbt-foundation-logo.jpg" alt="dbt Foundation Logo" width="300"/>
+</div>
+
+## 🐧 dbt Foundation
 
 A production-ready starter for dbt (Snowflake focused) designed to help you move from zero to a maintainable analytics engineering workflow quickly.
 
