@@ -4,7 +4,7 @@
 
 ## 🐧 dbt Foundation
 
-A production-ready starter for dbt (Snowflake focused) designed to help you move from zero to a maintainable analytics engineering workflow quickly.
+A production-ready starter for dbt (Snowflake focused) designed to help you move with your new dbt project or take examples for existing one.
 
 ## 1. Features At a Glance
 - Snowflake query tagging for deep observability (JSON metadata on every query) - [`yuki-snowflake-dbt-tags`](https://github.com/YukiTechnologies/yuki-snowflake-dbt-tags)
