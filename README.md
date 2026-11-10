@@ -13,6 +13,7 @@ A production-ready starter for dbt (Snowflake focused) designed to help you move
 - Automated quality checks before commit (prevent hard-coded objects, parse checks, semicolumns) - `.pre-commit-config.yaml`
 - `ref()` override for safe database/schema cloning - `macros/overrides/ref.sql`
 - Clean schema naming (no env prefix concatenation) - `macros/overrides/generate_schema_name.sql`
+- Opt-in atomic microbatch reloads (with `tmp_relation_type='table'`, a batch's rows never vanish mid-reload; see the section below for exceptions) - `macros/overrides/snowflake__get_incremental_microbatch_sql.sql`
 - Useful dbt-labs utility packages: [`dbt_utils`](https://github.com/dbt-labs/dbt-utils), [`dbt_project_evaluator`](https://github.com/dbt-labs/dbt-project-evaluator), [`codegen`](https://github.com/dbt-labs/dbt-codegen) - declared in `packages.yml`
 
 ### Quick Start (TL;DR)
@@ -253,6 +254,28 @@ DEV_DB.ANALYTICS.MY_MODEL       # without the added prefix
 ```
 
 Benefit: Grants/monitoring tools only need to consider `ANALYTICS` in each database (no proliferation of environment-prefixed schemas).
+
+---
+
+### Atomic Microbatch Reloads (snowflake__get_incremental_microbatch_sql)
+File: `macros/overrides/snowflake__get_incremental_microbatch_sql.sql`
+
+Upstream dbt-snowflake reloads a microbatch batch with a delete and an insert that commit separately. Between the two, the batch's time window is empty for every reader. If the insert computes from a view, that gap lasts as long as the model query.
+
+When a model opts in (see Usage), this override runs the delete and insert in one `EXECUTE IMMEDIATE` script block. Both commit together, or the block rolls back and re-raises, so a failed insert never leaves a half-applied reload or an open transaction behind.
+
+Usage:
+```sql
+{{ config(
+    materialized='incremental',
+    incremental_strategy='microbatch',
+    event_time='event_ts',
+    batch_size='day',
+    tmp_relation_type='table',
+) }}
+```
+
+Models without `tmp_relation_type='table'` (or `'transient'`) keep upstream behaviour: wrapping a view-backed batch would hold the delete's table lock for the whole model query. Iceberg tables also keep it, since externally managed ones only allow autocommit. So does SQL containing `$$`, which would break the dollar-quoted block.
 
 ---
 
