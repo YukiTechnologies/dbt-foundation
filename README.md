@@ -13,7 +13,7 @@ A production-ready starter for dbt (Snowflake focused) designed to help you move
 - Automated quality checks before commit (prevent hard-coded objects, parse checks, semicolumns) - `.pre-commit-config.yaml`
 - `ref()` override for safe database/schema cloning - `macros/overrides/ref.sql`
 - Clean schema naming (no env prefix concatenation) - `macros/overrides/generate_schema_name.sql`
-- Atomic microbatch reloads (a batch's rows never vanish mid-reload) - `macros/overrides/snowflake__get_incremental_microbatch_sql.sql`
+- Opt-in atomic microbatch reloads (with `tmp_relation_type='table'`, a batch's rows never vanish mid-reload; see the section below for exceptions) - `macros/overrides/snowflake__get_incremental_microbatch_sql.sql`
 - Useful dbt-labs utility packages: [`dbt_utils`](https://github.com/dbt-labs/dbt-utils), [`dbt_project_evaluator`](https://github.com/dbt-labs/dbt-project-evaluator), [`codegen`](https://github.com/dbt-labs/dbt-codegen) - declared in `packages.yml`
 
 ### Quick Start (TL;DR)
