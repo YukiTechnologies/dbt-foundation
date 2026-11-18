@@ -271,11 +271,12 @@ Usage:
     incremental_strategy='microbatch',
     event_time='event_ts',
     batch_size='day',
+    begin='2026-01-01',
     tmp_relation_type='table',
 ) }}
 ```
 
-Models without `tmp_relation_type='table'` (or `'transient'`) keep upstream behaviour: wrapping a view-backed batch would hold the delete's table lock for the whole model query. Iceberg tables also keep it, since externally managed ones only allow autocommit. So does SQL containing `$$`, which would break the dollar-quoted block.
+Models without `tmp_relation_type='table'` (or `'transient'`, on dbt-snowflake versions that support it) keep upstream behaviour: wrapping a view-backed batch would hold the delete's table lock for the whole model query. Iceberg tables also keep it, since externally managed ones only allow autocommit. So does SQL containing `$$`, which would break the dollar-quoted block.
 
 ---
 

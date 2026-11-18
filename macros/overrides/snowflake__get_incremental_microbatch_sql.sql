@@ -10,7 +10,8 @@
     for the whole model query. Iceberg targets (externally managed ones allow autocommit only) and SQL containing $$ also keep it.
     The predicate list is copied because dbt Fusion keeps the config's list across batches, so appending in
     place would AND every earlier batch's window into later deletes (dbt Core builds a fresh list per batch).
-    Usage: opt in with tmp_relation_type='table' (or 'transient') on the microbatch model.
+    Usage: opt in with tmp_relation_type='table' (or 'transient', where the installed dbt-snowflake supports it) on the
+    microbatch model. Wrapping needs both the opt-in and a table-backed temp relation.
     Based on: dbt-snowflake macros/materializations/incremental/merge.sql
 #}
 {% macro snowflake__get_incremental_microbatch_sql(arg_dict) %}
@@ -45,8 +46,8 @@
     )
     {%- endset %}
 
-    {#-- Wrap only when opted in with tmp_relation_type table/transient. Iceberg targets (externally managed ones allow autocommit only) and SQL containing $$ (would break the dollar-quoted block) keep upstream behaviour. --#}
-    {% if config.get('tmp_relation_type') in ('table', 'transient') and not target.is_iceberg_format and '$$' not in (delete_sql ~ insert_sql) %}
+    {#-- Wrap only when opted in with tmp_relation_type table/transient and the temp relation is a table (older dbt-snowflake, e.g. 1.9.0, resolves an unrecognised 'transient' to a view). Iceberg targets (externally managed ones allow autocommit only) and SQL containing $$ (would break the dollar-quoted block) keep upstream behaviour. --#}
+    {% if source.is_table and config.get('tmp_relation_type') in ('table', 'transient') and not target.is_iceberg_format and '$$' not in (delete_sql ~ insert_sql) %}
     execute immediate $$
     begin
         begin transaction;
