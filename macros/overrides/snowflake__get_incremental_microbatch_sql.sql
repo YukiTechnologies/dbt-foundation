@@ -8,6 +8,8 @@
     open on the connection, where the next DDL would commit the delete.
     View-backed batches keep upstream's unwrapped SQL, since wrapping them would hold the delete's table lock
     for the whole model query. Iceberg targets (externally managed ones allow autocommit only) and SQL containing $$ also keep it.
+    The predicate list is copied because dbt Fusion keeps the config's list across batches, so appending in
+    place would AND every earlier batch's window into later deletes (dbt Core builds a fresh list per batch).
     Usage: opt in with tmp_relation_type='table' (or 'transient') on the microbatch model.
     Based on: dbt-snowflake macros/materializations/incremental/merge.sql
 #}
@@ -15,7 +17,7 @@
     {%- set target = arg_dict["target_relation"] -%}
     {%- set source = arg_dict["temp_relation"] -%}
     {%- set dest_columns = arg_dict["dest_columns"] -%}
-    {%- set incremental_predicates = [] if arg_dict.get('incremental_predicates') is none else arg_dict.get('incremental_predicates') -%}
+    {%- set incremental_predicates = [] + (arg_dict.get('incremental_predicates') or []) -%}
 
     {#-- Add additional incremental_predicates to filter for batch --#}
     {% if model.batch and model.batch.event_time_start -%}
